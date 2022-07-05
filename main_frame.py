@@ -8,6 +8,14 @@ class MainFrame(ttk.Frame):
         options = dict(padx=5, pady=5)
 
         def length_slider_changed(event):
+            length.set(round(length.get(), 1))
+            renew_calculation()
+
+        def length_spinbox_changed():
+            length.set(round(length.get(), 1))
+            renew_calculation()
+
+        def renew_calculation():
             pass
 
         # get length of pendulum
@@ -18,6 +26,7 @@ class MainFrame(ttk.Frame):
         ttk.Scale(self, variable=length, command=length_slider_changed,
                   orient='horizontal', length=150, from_=1, to=50) \
             .grid(column=1, row=0, sticky=tk.E, **options)
-        ttk.Spinbox(self, textvariable=length, wrap=True, width=15, from_=1, to=50) \
+        ttk.Spinbox(self, textvariable=length, command=length_spinbox_changed,
+                    increment=0.1, wrap=True, width=5, from_=1, to=50) \
             .grid(column=2, row=0, sticky=tk.E, **options)
         self.grid(padx=50, pady=50, sticky=tk.NSEW)
