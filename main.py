@@ -1,7 +1,7 @@
-from main_frame import *
-from main_window import *
+import main_frame as mf
+import main_window as mw
 
 if __name__ == '__main__':
-    app = App()
-    main_frame = MainFrame(app)
+    app = mw.App()
+    main_frame = mf.MainFrame(app)
     app.mainloop()
