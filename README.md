@@ -4,5 +4,3 @@
 2. **Tips**
 - Insert snippet (template code) : Ctrl+J
 - To commit a version: Ctrl + K
-
-Long and Minh
