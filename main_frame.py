@@ -229,4 +229,22 @@ class MainFrame(ttk.Frame):
                     increment=0.1, wrap=True, width=5, from_=1, to=50) \
             .grid(column=2, row=9, sticky=tk.W, **options)
 
+        # Create a Tkinter variable
+        dropdown_value = tk.StringVar(self)
+
+        # Dictionary with options
+        choices = {'Small angles', 'Euler', 'Improved Euler', 'RK4'}
+        dropdown_value.set('Small angles')  # set the default option
+
+        popup_menu = ttk.OptionMenu(self, dropdown_value, *choices)
+        ttk.Label(self, text="Choose a numerical method").grid(row=10, column=0)
+        popup_menu.grid(row=10, column=1)
+
+        # on change dropdown value
+        def change_dropdown(*args):
+            print(dropdown_value.get())
+
+        # link function to change dropdown
+        dropdown_value.trace('w', change_dropdown)
+
         self.grid(padx=50, pady=50, sticky=tk.NSEW)
