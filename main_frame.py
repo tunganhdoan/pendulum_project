@@ -105,6 +105,9 @@ class MainFrame(ttk.Frame):
             time_rate.set(round(time_rate.get(), 1))
             renew_calculation()
 
+        def popup_menu_changed(event):
+            renew_calculation()
+
         def first_initialize():
             l = 2.0
             g = 9.8
@@ -130,27 +133,52 @@ class MainFrame(ttk.Frame):
             m = mass.get()
             g = gravity.get()
             theta_0 = initial_angle.get()
-            theta_prime = initial_angular_velocity.get()
+            theta_prime_0 = initial_angular_velocity.get()
             beta = damping.get()
             a = force_amplitude.get()
             f = force_frequency.get()
             dt = time_step.get()
             rate = time_rate.get()
-
-            t = np.arange(0, 20, dt)
+            t_initial = 0
+            t_stop = 20
+            t = np.arange(t_initial, t_stop, dt)
             sim_points = len(t)
             index = np.arange(0, sim_points, 1)
-              # Catch the choice of numerical method
-            match dropdown_value:
-                case 'Small angles':
-                    period = 2 * np.pi * np.sqrt(l / g)
-                    theta = theta_0 * np.cos(np.sqrt(g / l) * t)
-                case 'Euler':
-                    print('Euler')
-                case 'Improved Euler_':
-                    print('Improved Euler')
-                case 'RK4':
-                    print('RK4')
+
+            # Catch the choice of numerical method
+            def euler(dt, theta_prime, theta):
+                dt = dt * np.sqrt(g / l)
+                d_theta = dt * theta_prime
+                d_theta_prime = dt * (-np.sin(theta))
+                theta_prime = theta_prime + d_theta_prime
+                theta = theta + d_theta
+                return (theta_prime, theta)
+
+            def euler_array(theta_prime_0, theta_0, t_initial, t_stop):
+                theta_prime = theta_prime_0
+                theta = theta_0
+                t = t_initial
+                euler_list = []
+                while t < t_stop:
+                    (theta_prime, theta) = euler(dt, theta_prime, theta)
+                    t = t + dt
+                    euler_list.append((t, theta, theta_prime))
+
+                return euler_list
+
+            if dropdown_value.get() == 'Small angles':
+                theta = theta_0 * np.cos(np.sqrt(g / l) * t)
+            elif dropdown_value.get() == 'Euler':
+                euler_list = []
+                euler_list = euler_array(theta_prime_0, theta_0, t_initial, t_stop)
+                t = [x[0] for x in euler_list]
+                theta = [x[1] for x in euler_list]
+            elif dropdown_value.get() == 'Improved Euler':
+                theta = theta_0 * np.cos(np.sqrt(g / l) * t)
+            elif dropdown_value.get() == 'RK4':
+                theta = theta_0 * np.cos(np.sqrt(g / l) * t)
+            else:
+                theta = theta_0 * np.cos(np.sqrt(g / l) * t)
 
 
             figure = Figure(figsize=(4, 4), dpi=200)
@@ -207,7 +235,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=2, sticky=tk.W, **options)
 
         # get initial_angle of pendulum
-        initial_angle = tk.DoubleVar(value=10.0)
+        initial_angle = tk.DoubleVar(value=0.5)
 
         ttk.Label(self, text="Initial Angle") \
             .grid(column=0, row=3, sticky=tk.E, **options)
@@ -310,14 +338,15 @@ class MainFrame(ttk.Frame):
         choices = ['Small angles', 'Euler', 'Improved Euler', 'RK4']
         # Find the length of maximum character in the option
         menu_width = len(max(choices, key=len))
-        popup_menu = ttk.OptionMenu(self, dropdown_value, choices[0], *choices)
+        popup_menu = ttk.OptionMenu(self, dropdown_value, choices[0], *choices, command=popup_menu_changed)
         ttk.Label(self, text="Choose a numerical method").grid(row=10, column=0, sticky=tk.EW)
         popup_menu.grid(row=10, column=1)
         # set the default option
         popup_menu.config(width=menu_width)
 
         def change_dropdown(*args):
-            print(dropdown_value.get())
+            pass
+            #print(dropdown_value.get())
 
         # link function to change dropdown
         dropdown_value.trace('w', change_dropdown)
