@@ -112,7 +112,7 @@ class MainFrame(ttk.Frame):
             t = np.arange(0, 30, dt)
             theta_0 = 10.0
             theta = theta_0 * np.cos(np.sqrt(g / l) * t)
-            figure = Figure(figsize=(4, 4), dpi=200)
+            figure = Figure(figsize=(4, 4), dpi=100)
             axes = figure.add_subplot()
             axes.plot(t, theta, 'g', label='plot')
             axes.set_title('Harmonic motion')
@@ -121,8 +121,10 @@ class MainFrame(ttk.Frame):
             figure_canvas = FigureCanvasTkAgg(figure, master=self)
             figure_canvas.draw()
             # create axes
-            figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=100, columnspan=100, padx=60, pady=20)
+            figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=100, columnspan=100, padx=10, pady=20)
+
         first_initialize()
+
         def renew_calculation():
             l = length.get()
             m = mass.get()
@@ -138,8 +140,18 @@ class MainFrame(ttk.Frame):
             t = np.arange(0, 20, dt)
             sim_points = len(t)
             index = np.arange(0, sim_points, 1)
-            period = 2 * np.pi * np.sqrt(l / g)
-            theta = theta_0 * np.cos(np.sqrt(g / l) * t)
+              # Catch the choice of numerical method
+            match dropdown_value:
+                case 'Small angles':
+                    period = 2 * np.pi * np.sqrt(l / g)
+                    theta = theta_0 * np.cos(np.sqrt(g / l) * t)
+                case 'Euler':
+                    print('Euler')
+                case 'Improved Euler_':
+                    print('Improved Euler')
+                case 'RK4':
+                    print('RK4')
+
 
             figure = Figure(figsize=(4, 4), dpi=200)
             axes = figure.add_subplot()
@@ -291,20 +303,18 @@ class MainFrame(ttk.Frame):
                     increment=0.1, wrap=True, width=5, from_=1, to=50) \
             .grid(column=2, row=9, sticky=tk.W, **options)
 
-        # Create a Tkinter variable
+        # Create a Tkinter dropdown
         dropdown_value = tk.StringVar(self)
-        dropdown_value.set('Small angles')  # set the default option
+
         # Dictionary with options
-        choices = {'Small angles', 'Euler', 'Improved Euler', 'RK4'}
+        choices = ['Small angles', 'Euler', 'Improved Euler', 'RK4']
         # Find the length of maximum character in the option
         menu_width = len(max(choices, key=len))
-
-        popup_menu = ttk.OptionMenu(self, dropdown_value, *choices)
+        popup_menu = ttk.OptionMenu(self, dropdown_value, choices[0], *choices)
         ttk.Label(self, text="Choose a numerical method").grid(row=10, column=0, sticky=tk.EW)
         popup_menu.grid(row=10, column=1)
-
+        # set the default option
         popup_menu.config(width=menu_width)
-        print(popup_menu['menu'].keys())
 
         def change_dropdown(*args):
             print(dropdown_value.get())
