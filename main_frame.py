@@ -6,6 +6,13 @@ class MainFrame(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
         options = dict(padx=5, pady=5)
+        self.option_add("*font", "Bahnschrift 15 bold")
+        style = ttk.Style()
+        self.columnconfigure(0, weight=10)
+        self.columnconfigure(1, weight=20)
+        self.columnconfigure(2, weight=4)
+        self.columnconfigure(3, weight=4)
+        self.columnconfigure(4, weight=4)
 
         def length_slider_changed(event):
             length.set(round(length.get(), 1))
@@ -70,7 +77,7 @@ class MainFrame(ttk.Frame):
         def force_frequency_spinbox_changed():
             force_frequency.set(round(force_frequency.get(), 1))
             renew_calculation()
-            
+
         def time_step_slider_changed(event):
             time_step.set(round(time_step.get(), 1))
             renew_calculation()
@@ -78,7 +85,7 @@ class MainFrame(ttk.Frame):
         def time_step_spinbox_changed():
             time_step.set(round(time_step.get(), 1))
             renew_calculation()
-            
+
         def time_rate_slider_changed(event):
             time_rate.set(round(time_rate.get(), 1))
             renew_calculation()
@@ -231,16 +238,18 @@ class MainFrame(ttk.Frame):
 
         # Create a Tkinter variable
         dropdown_value = tk.StringVar(self)
-
+        dropdown_value.set('Small angles')  # set the default option
         # Dictionary with options
         choices = {'Small angles', 'Euler', 'Improved Euler', 'RK4'}
-        dropdown_value.set('Small angles')  # set the default option
+        # Find the length of maximum character in the option
+        menu_width = len(max(choices, key=len))
 
         popup_menu = ttk.OptionMenu(self, dropdown_value, *choices)
-        ttk.Label(self, text="Choose a numerical method").grid(row=10, column=0)
+        ttk.Label(self, text="Choose a numerical method").grid(row=10, column=0, sticky=tk.EW)
         popup_menu.grid(row=10, column=1)
+        style.configure("TMenubutton", font="Bahnschrift 15 bold")
+        popup_menu.config(width=menu_width)
 
-        # on change dropdown value
         def change_dropdown(*args):
             print(dropdown_value.get())
 
