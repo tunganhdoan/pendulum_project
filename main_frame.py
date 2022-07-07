@@ -1,12 +1,23 @@
 import tkinter as tk
 from tkinter import ttk
 
+import matplotlib
+import numpy as np
+
+matplotlib.use('TkAgg')
+
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg
+)
+
 
 class MainFrame(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
         options = dict(padx=5, pady=5)
-        self.option_add("*font", "Bahnschrift 15 bold")
+        set_font = "Bahnschrift 15 bold"
+        self.option_add("*font", set_font)
         style = ttk.Style()
         self.columnconfigure(0, weight=10)
         self.columnconfigure(1, weight=20)
@@ -94,8 +105,52 @@ class MainFrame(ttk.Frame):
             time_rate.set(round(time_rate.get(), 1))
             renew_calculation()
 
+        def first_initialize():
+            l = 2.0
+            g = 9.8
+            dt = 0.01
+            t = np.arange(0, 30, dt)
+            theta_0 = 10.0
+            theta = theta_0 * np.cos(np.sqrt(g / l) * t)
+            figure = Figure(figsize=(4, 4), dpi=200)
+            axes = figure.add_subplot()
+            axes.plot(t, theta, 'g', label='plot')
+            axes.set_title('Harmonic motion')
+            axes.set_xlabel('Time')
+            # create FigureCanvasTkAgg object
+            figure_canvas = FigureCanvasTkAgg(figure, master=self)
+            figure_canvas.draw()
+            # create axes
+            figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=100, columnspan=100, padx=60, pady=20)
+        first_initialize()
         def renew_calculation():
-            pass
+            l = length.get()
+            m = mass.get()
+            g = gravity.get()
+            theta_0 = initial_angle.get()
+            theta_prime = initial_angular_velocity.get()
+            beta = damping.get()
+            a = force_amplitude.get()
+            f = force_frequency.get()
+            dt = time_step.get()
+            rate = time_rate.get()
+
+            t = np.arange(0, 20, dt)
+            sim_points = len(t)
+            index = np.arange(0, sim_points, 1)
+            period = 2 * np.pi * np.sqrt(l / g)
+            theta = theta_0 * np.cos(np.sqrt(g / l) * t)
+
+            figure = Figure(figsize=(4, 4), dpi=200)
+            axes = figure.add_subplot()
+            axes.plot(t, theta, 'g', label='plot')
+            axes.set_title('Harmonic motion')
+            axes.set_xlabel('Time')
+            # create FigureCanvasTkAgg object
+            figure_canvas = FigureCanvasTkAgg(figure, master=self)
+            figure_canvas.draw()
+            # create axes
+            figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=100, columnspan=100, padx=60, pady=20)
 
         # get length of pendulum
         length = tk.DoubleVar(value=2.0)
@@ -213,7 +268,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=7, sticky=tk.W, **options)
 
         # set time_step of pendulum
-        time_step = tk.DoubleVar(value=0.0)
+        time_step = tk.DoubleVar(value=0.01)
 
         ttk.Label(self, text="Time Step: ") \
             .grid(column=0, row=8, sticky=tk.E, **options)
@@ -247,13 +302,18 @@ class MainFrame(ttk.Frame):
         popup_menu = ttk.OptionMenu(self, dropdown_value, *choices)
         ttk.Label(self, text="Choose a numerical method").grid(row=10, column=0, sticky=tk.EW)
         popup_menu.grid(row=10, column=1)
-        style.configure("TMenubutton", font="Bahnschrift 15 bold")
+
         popup_menu.config(width=menu_width)
+        print(popup_menu['menu'].keys())
 
         def change_dropdown(*args):
             print(dropdown_value.get())
 
         # link function to change dropdown
         dropdown_value.trace('w', change_dropdown)
+
+        style.configure("TMenubutton", font=set_font)
+        style.configure("TRadiobutton", font=set_font)
+        style.configure('TMenubutton', borderwidth=1)
 
         self.grid(padx=50, pady=50, sticky=tk.NSEW)
