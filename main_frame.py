@@ -1,15 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
 
-import matplotlib
+import matplotlib as plt
 import numpy as np
 
-matplotlib.use('TkAgg')
+plt.use('TkAgg')
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg
-)
+    FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 
 class MainFrame(ttk.Frame):
@@ -108,25 +107,27 @@ class MainFrame(ttk.Frame):
         def popup_menu_changed(event):
             renew_calculation()
 
-        def first_initialize():
-            l = 2.0
-            g = 9.8
-            dt = 0.01
-            t = np.arange(0, 30, dt)
-            theta_0 = 10.0
-            theta = theta_0 * np.cos(np.sqrt(g / l) * t)
-            figure = Figure(figsize=(4, 4), dpi=100)
-            axes = figure.add_subplot()
-            axes.plot(t, theta, 'g', label='plot')
-            axes.set_title('Harmonic motion')
-            axes.set_xlabel('Time')
-            # create FigureCanvasTkAgg object
-            figure_canvas = FigureCanvasTkAgg(figure, master=self)
-            figure_canvas.draw()
-            # create axes
-            figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=100, columnspan=100, padx=10, pady=20)
-
-        first_initialize()
+        l = 2.0
+        g = 9.8
+        dt = 0.01
+        t = np.arange(0, 30, dt)
+        theta_0 = 1.0
+        theta = theta_0 * np.cos(np.sqrt(g / l) * t)
+        figure = Figure(constrained_layout=True,figsize=(3, 3), dpi=100)
+        figure.patch.set_facecolor('whitesmoke')
+        axes = figure.add_subplot()
+        line, = axes.plot(t, theta, 'g', label='plot')
+        axes.autoscale(enable=None, axis="x", tight=False)
+        axes.set_title('Harmonic motion')
+        axes.set_xlabel('Time')
+        # create FigureCanvasTkAgg object
+        figure_canvas = FigureCanvasTkAgg(figure, master=self)
+        figure_canvas.draw()
+        # pack_toolbar=False will make it easier to use a layout manager later on.
+        toolbar = NavigationToolbar2Tk(figure_canvas, self, pack_toolbar=False)
+        toolbar.update()
+        # create axes
+        figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=100, columnspan=100, padx=10, pady=20)
 
         def renew_calculation():
             l = length.get()
@@ -140,7 +141,7 @@ class MainFrame(ttk.Frame):
             dt = time_step.get()
             rate = time_rate.get()
             t_initial = 0
-            t_stop = 20
+            t_stop = 30
             t = np.arange(t_initial, t_stop, dt)
             sim_points = len(t)
             index = np.arange(0, sim_points, 1)
@@ -180,17 +181,9 @@ class MainFrame(ttk.Frame):
             else:
                 theta = theta_0 * np.cos(np.sqrt(g / l) * t)
 
-
-            figure = Figure(figsize=(4, 4), dpi=200)
-            axes = figure.add_subplot()
-            axes.plot(t, theta, 'g', label='plot')
-            axes.set_title('Harmonic motion')
-            axes.set_xlabel('Time')
-            # create FigureCanvasTkAgg object
-            figure_canvas = FigureCanvasTkAgg(figure, master=self)
+            line.set_data(t, theta)
+            axes.autoscale(enable=None, axis="x", tight=True)
             figure_canvas.draw()
-            # create axes
-            figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=100, columnspan=100, padx=60, pady=20)
 
         # get length of pendulum
         length = tk.DoubleVar(value=2.0)
@@ -235,7 +228,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=2, sticky=tk.W, **options)
 
         # get initial_angle of pendulum
-        initial_angle = tk.DoubleVar(value=0.5)
+        initial_angle = tk.DoubleVar(value=1.0)
 
         ttk.Label(self, text="Initial Angle") \
             .grid(column=0, row=3, sticky=tk.E, **options)
@@ -346,7 +339,7 @@ class MainFrame(ttk.Frame):
 
         def change_dropdown(*args):
             pass
-            #print(dropdown_value.get())
+            # print(dropdown_value.get())
 
         # link function to change dropdown
         dropdown_value.trace('w', change_dropdown)
