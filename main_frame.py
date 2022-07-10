@@ -26,86 +26,89 @@ class MainFrame(ttk.Frame):
 
         def length_slider_changed(event):
             length.set(round(length.get(), 1))
-            renew_calculation()
+            update()
 
         def length_spinbox_changed():
             length.set(round(length.get(), 1))
-            renew_calculation()
+            update()
 
         def mass_slider_changed(event):
             mass.set(round(mass.get(), 1))
-            renew_calculation()
+            update()
 
         def mass_spinbox_changed():
             mass.set(round(mass.get(), 1))
-            renew_calculation()
+            update()
 
         def gravity_slider_changed(event):
             gravity.set(round(gravity.get(), 1))
-            renew_calculation()
+            update()
 
         def gravity_spinbox_changed():
             gravity.set(round(gravity.get(), 1))
-            renew_calculation()
+            update()
 
         def initial_angle_slider_changed(event):
             initial_angle.set(round(initial_angle.get(), 1))
-            renew_calculation()
+            update()
 
         def initial_angle_spinbox_changed():
             initial_angle.set(round(initial_angle.get(), 1))
-            renew_calculation()
+            update()
 
         def initial_angular_velocity_slider_changed(event):
             initial_angular_velocity.set(round(initial_angular_velocity.get(), 1))
-            renew_calculation()
+            update()
 
         def initial_angular_velocity_spinbox_changed():
             initial_angular_velocity.set(round(initial_angular_velocity.get(), 1))
-            renew_calculation()
+            update()
 
         def damping_slider_changed(event):
             damping.set(round(damping.get(), 1))
-            renew_calculation()
+            update()
 
         def damping_spinbox_changed():
             damping.set(round(damping.get(), 1))
-            renew_calculation()
+            update()
 
         def force_amplitude_slider_changed(event):
             force_amplitude.set(round(force_amplitude.get(), 1))
-            renew_calculation()
+            update()
 
         def force_amplitude_spinbox_changed():
             force_amplitude.set(round(force_amplitude.get(), 1))
-            renew_calculation()
+            update()
 
         def force_frequency_slider_changed(event):
             force_frequency.set(round(force_frequency.get(), 1))
-            renew_calculation()
+            update()
 
         def force_frequency_spinbox_changed():
             force_frequency.set(round(force_frequency.get(), 1))
-            renew_calculation()
+            update()
 
         def time_step_slider_changed(event):
             time_step.set(round(time_step.get(), 1))
-            renew_calculation()
+            update()
 
         def time_step_spinbox_changed():
             time_step.set(round(time_step.get(), 1))
-            renew_calculation()
+            update()
 
         def time_rate_slider_changed(event):
             time_rate.set(round(time_rate.get(), 1))
-            renew_calculation()
+            update()
 
         def time_rate_spinbox_changed():
             time_rate.set(round(time_rate.get(), 1))
-            renew_calculation()
+            update()
 
         def popup_menu_changed(event):
-            renew_calculation()
+            update()
+
+        def autoscale_cb_changed():
+            update()
 
         l = 2.0
         g = 9.8
@@ -113,7 +116,7 @@ class MainFrame(ttk.Frame):
         t = np.arange(0, 30, dt)
         theta_0 = 1.0
         theta = theta_0 * np.cos(np.sqrt(g / l) * t)
-        figure = Figure(constrained_layout=True,figsize=(3, 3), dpi=100)
+        figure = Figure(constrained_layout=True, figsize=(3, 3), dpi=100)
         figure.patch.set_facecolor('whitesmoke')
         axes = figure.add_subplot()
         line, = axes.plot(t, theta, 'g', label='plot')
@@ -128,8 +131,11 @@ class MainFrame(ttk.Frame):
         toolbar.update()
         # create axes
         figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=100, columnspan=100, padx=10, pady=20)
+        autoscale = tk.IntVar()
+        tk.Checkbutton(self, text='autoscale', variable=autoscale, onvalue=1, offvalue=0, command=autoscale_cb_changed)\
+            .grid(column=10, row=9, padx=10, pady=0)
 
-        def renew_calculation():
+        def update():
             l = length.get()
             m = mass.get()
             g = gravity.get()
@@ -182,7 +188,14 @@ class MainFrame(ttk.Frame):
                 theta = theta_0 * np.cos(np.sqrt(g / l) * t)
 
             line.set_data(t, theta)
-            axes.autoscale(enable=None, axis="x", tight=True)
+            if autoscale.get() == 0:
+                ax1_lim = ((min(t), min(theta)), (max(t), max(theta)))
+                axes.update_datalim(ax1_lim)
+                print("autoscale 0: {ax1_lim}")
+            else:
+                axes.relim()
+                print("relim")
+            axes.autoscale(enable=True, axis="y", tight=True)
             figure_canvas.draw()
 
         # get length of pendulum
