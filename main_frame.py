@@ -1,3 +1,4 @@
+import math
 import tkinter as tk
 from tkinter import ttk
 
@@ -49,11 +50,27 @@ class MainFrame(ttk.Frame):
             update()
 
         def initial_angle_slider_changed(event):
-            initial_angle.set(round(initial_angle.get(), 1))
+            if angle_choice.get() == 1:
+                temp_rad = math.radians(initial_angle.get())
+                initial_angle.set(round(temp_rad, 1))
+            else:
+                initial_angle.set(round(initial_angle.get(), 1))
             update()
 
         def initial_angle_spinbox_changed():
-            initial_angle.set(round(initial_angle.get(), 1))
+            if angle_choice.get() == 1:
+                temp_rad = math.radians(initial_angle.get())
+                initial_angle.set(round(temp_rad, 1))
+            else:
+                initial_angle.set(round(initial_angle.get(), 1))
+            update()
+
+        def initial_angle_choice_changed():
+            if angle_choice.get() == 1:
+                temp_rad = math.radians(initial_angle.get())
+                initial_angle.set(round(temp_rad, 1))
+            else:
+                initial_angle.set(round(initial_angle.get(), 1))
             update()
 
         def initial_angular_velocity_slider_changed(event):
@@ -132,7 +149,7 @@ class MainFrame(ttk.Frame):
         # create axes
         figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=100, columnspan=100, padx=10, pady=20)
         autoscale = tk.IntVar()
-        tk.Checkbutton(self, text='autoscale', variable=autoscale, onvalue=1, offvalue=0, command=autoscale_cb_changed)\
+        tk.Checkbutton(self, text='autoscale', variable=autoscale, onvalue=1, offvalue=0, command=autoscale_cb_changed) \
             .grid(column=10, row=9, padx=10, pady=0)
 
         def update():
@@ -140,7 +157,7 @@ class MainFrame(ttk.Frame):
             m = mass.get()
             g = gravity.get()
             theta_0 = initial_angle.get()
-            theta_prime_0 = initial_angular_velocity.get()
+            v_0 = initial_angular_velocity.get()
             beta = damping.get()
             a = force_amplitude.get()
             f = force_frequency.get()
@@ -153,20 +170,20 @@ class MainFrame(ttk.Frame):
             index = np.arange(0, sim_points, 1)
 
             # Catch the choice of numerical method
-            def euler(dt, theta_prime, theta):
+            def euler(dt, v, theta):
                 dt = dt * np.sqrt(g / l)
-                d_theta = dt * theta_prime
-                d_theta_prime = dt * (-np.sin(theta))
-                theta_prime = theta_prime + d_theta_prime
+                d_theta = dt * v
+                dv = dt * (-np.sin(theta))
+                v = v + dv
                 theta = theta + d_theta
-                return (theta_prime, theta)
+                return (v, theta)
 
-            def euler_array(theta_prime_0, theta_0, t_initial, t_stop):
-                theta_prime = theta_prime_0
+            def euler_array(v_0, theta_0, t_0, t_end):
+                theta_prime = v_0
                 theta = theta_0
-                t = t_initial
+                t = t_0
                 euler_list = []
-                while t < t_stop:
+                while t < t_end:
                     (theta_prime, theta) = euler(dt, theta_prime, theta)
                     t = t + dt
                     euler_list.append((t, theta, theta_prime))
@@ -177,7 +194,7 @@ class MainFrame(ttk.Frame):
                 theta = theta_0 * np.cos(np.sqrt(g / l) * t)
             elif dropdown_value.get() == 'Euler':
                 euler_list = []
-                euler_list = euler_array(theta_prime_0, theta_0, t_initial, t_stop)
+                euler_list = euler_array(v_0, theta_0, t_initial, t_stop)
                 t = [x[0] for x in euler_list]
                 theta = [x[1] for x in euler_list]
             elif dropdown_value.get() == 'Improved Euler':
@@ -191,10 +208,8 @@ class MainFrame(ttk.Frame):
             if autoscale.get() == 0:
                 ax1_lim = ((min(t), min(theta)), (max(t), max(theta)))
                 axes.update_datalim(ax1_lim)
-                print("autoscale 0: {ax1_lim}")
             else:
                 axes.relim()
-                print("relim")
             axes.autoscale(enable=True, axis="y", tight=True)
             figure_canvas.draw()
 
@@ -251,12 +266,13 @@ class MainFrame(ttk.Frame):
         ttk.Spinbox(self, textvariable=initial_angle, command=initial_angle_spinbox_changed,
                     increment=0.1, wrap=True, width=5, from_=1, to=50) \
             .grid(column=2, row=3, sticky=tk.W, **options)
-        angle_choice = tk.IntVar(value=1)
+        angle_choice = tk.IntVar(value=0)
         # Dictionary to create multiple buttons
-        rad_vs_degree = {"rad": 1, "degree": 2}
-        for (text, rad_vs_degree) in rad_vs_degree.items():
-            ttk.Radiobutton(self, text=text, variable=angle_choice, value=rad_vs_degree) \
-                .grid(column=3 + int(rad_vs_degree), row=3, sticky=tk.W, **options)
+        rad_vs_degree = {"rad": 0, "degree": 1}
+        for (text, choice_value) in rad_vs_degree.items():
+            ttk.Radiobutton(self, text=text, variable=angle_choice, value=choice_value,
+                            command=initial_angle_choice_changed) \
+                .grid(column=4 + int(choice_value), row=3, sticky=tk.W, **options)
 
         # get initial_angular_velocity of pendulum
         initial_angular_velocity = tk.DoubleVar(value=0.0)
