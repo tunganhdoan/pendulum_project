@@ -2,10 +2,11 @@ import math
 import tkinter as tk
 from tkinter import ttk
 
-import matplotlib as plt
+from matplotlib import pyplot as plt
 import numpy as np
 
-plt.use('TkAgg')
+import matplotlib
+matplotlib.use("TkAgg")
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (
@@ -229,7 +230,6 @@ class MainFrame(ttk.Frame):
 
         # get length of pendulum
 
-
         ttk.Label(self, text="Length: ") \
             .grid(column=0, row=0, sticky=tk.E, **options)
         ttk.Label(self, text="(m)") \
@@ -242,7 +242,6 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=0, sticky=tk.W, **options)
 
         # get mass of pendulum
-
 
         ttk.Label(self, text="Mass: ") \
             .grid(column=0, row=1, sticky=tk.E, **options)
@@ -257,7 +256,6 @@ class MainFrame(ttk.Frame):
 
         # get gravity of pendulum
 
-
         ttk.Label(self, text="Gravity: ") \
             .grid(column=0, row=2, sticky=tk.E, **options)
         ttk.Label(self, text="(m/s^2)") \
@@ -270,7 +268,6 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=2, sticky=tk.W, **options)
 
         # get initial_angle of pendulum
-
 
         ttk.Label(self, text="Initial Angle") \
             .grid(column=0, row=3, sticky=tk.E, **options)
@@ -290,7 +287,6 @@ class MainFrame(ttk.Frame):
 
         # get initial_angular_velocity of pendulum
 
-
         ttk.Label(self, text="Initial Angular Velocity:") \
             .grid(column=0, row=4, sticky=tk.E, **options)
 
@@ -309,7 +305,6 @@ class MainFrame(ttk.Frame):
 
         # get damping of pendulum
 
-
         ttk.Label(self, text="Damping: ") \
             .grid(column=0, row=5, sticky=tk.E, **options)
         ttk.Scale(self, variable=damping, command=damping_slider_changed,
@@ -320,7 +315,6 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=5, sticky=tk.W, **options)
 
         # get force_amplitude of pendulum
-
 
         ttk.Label(self, text="Force Amplitude: ") \
             .grid(column=0, row=6, sticky=tk.E, **options)
@@ -333,7 +327,6 @@ class MainFrame(ttk.Frame):
 
         # get force_frequency of pendulum
 
-
         ttk.Label(self, text="Force Frequency: ") \
             .grid(column=0, row=7, sticky=tk.E, **options)
         ttk.Scale(self, variable=force_frequency, command=force_frequency_slider_changed,
@@ -344,7 +337,6 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=7, sticky=tk.W, **options)
 
         # set time_step of pendulum
-
 
         ttk.Label(self, text="Time Step: ") \
             .grid(column=0, row=8, sticky=tk.E, **options)
@@ -357,7 +349,6 @@ class MainFrame(ttk.Frame):
 
         # set time_rate of pendulum
 
-
         ttk.Label(self, text="Time Rate: ") \
             .grid(column=0, row=9, sticky=tk.E, **options)
         ttk.Scale(self, variable=time_rate, command=time_rate_slider_changed,
@@ -368,7 +359,6 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=9, sticky=tk.W, **options)
 
         # Create a Tkinter dropdown
-
 
         # Dictionary with options
         choices = ['Small angles', 'Euler', 'Improved Euler', 'RK4']
