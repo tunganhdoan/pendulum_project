@@ -167,18 +167,18 @@ class MainFrame(ttk.Frame):
 
         fig = plt.Figure()
         t = np.arange(0, 30, dt)
+
         def animate(i):
             # line.set_ydata(np.sin(t + i / 10.0))  # update the data
-            line.set_ydata(theta_0 * np.cos(np.sqrt(g / l) * (t + i / 10.0)))  # update the data
+            line1.set_ydata(theta_0 * np.cos(np.sqrt(g / l) * (t + i / 10.0)))  # update the data
             return line,
 
-        canvas = FigureCanvasTkAgg(fig, master=container)
-        canvas.get_tk_widget().grid(column=0, row=0, rowspan=10, columnspan=10, padx=10, pady=20)
+        canvas = FigureCanvasTkAgg(fig, master=self)
+        canvas.get_tk_widget().grid(column=0, row=22, rowspan=10, columnspan=10, padx=10, pady=20)
 
         ax = fig.add_subplot(111)
-        line, = ax.plot(t, np.sin(t))
+        line1, = ax.plot(t, theta_0 * np.cos(np.sqrt(g / l) * t))
         ani = animation.FuncAnimation(fig, animate, np.arange(1, 200), interval=25, blit=False)
-
 
         autoscale = tk.IntVar()
         tk.Checkbutton(self, text='autoscale', variable=autoscale, onvalue=1, offvalue=0, command=autoscale_cb_changed) \
@@ -379,6 +379,7 @@ class MainFrame(ttk.Frame):
         def change_dropdown(*args):
             pass
             # print(self.dropdown_value.get())
+
         # link function to change dropdown
         self.dropdown_value.trace('w', change_dropdown)
 
