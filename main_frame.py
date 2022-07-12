@@ -3,9 +3,9 @@ import tkinter as tk
 from tkinter import ttk
 
 import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
+from matplotlib import pyplot as plt
 
 matplotlib.use('TkAgg')
 
@@ -42,7 +42,7 @@ class MainFrame(ttk.Frame):
         self.dropdown_value = tk.StringVar(self)
 
         def length_slider_changed(event):
-            self.length.set(round(self.length.get(), 1))
+            self.length.set(round(float(event), 1))
             update()
 
         def length_spinbox_changed():
@@ -171,14 +171,14 @@ class MainFrame(ttk.Frame):
         def animate(i):
             # line.set_ydata(np.sin(t + i / 10.0))  # update the data
             line1.set_ydata(theta_0 * np.cos(np.sqrt(g / l) * (t + i / 10.0)))  # update the data
-            return line,
+            return line1,
 
         canvas = FigureCanvasTkAgg(fig, master=self)
         canvas.get_tk_widget().grid(column=0, row=22, rowspan=10, columnspan=10, padx=10, pady=20)
 
         ax = fig.add_subplot(111)
         line1, = ax.plot(t, theta_0 * np.cos(np.sqrt(g / l) * t))
-        ani = animation.FuncAnimation(fig, animate, np.arange(1, 200), interval=25, blit=False)
+        ani = animation.FuncAnimation(fig, animate, np.arange(1, 200), interval=25, blit=True)
 
         autoscale = tk.IntVar()
         tk.Checkbutton(self, text='autoscale', variable=autoscale, onvalue=1, offvalue=0, command=autoscale_cb_changed) \
@@ -237,6 +237,7 @@ class MainFrame(ttk.Frame):
                 theta = theta_0 * np.cos(np.sqrt(g / l) * t)
 
             line.set_data(t, theta)
+
             if autoscale.get() == 0:
                 ax1_lim = ((min(t), min(theta)), (max(t), max(theta)))
                 axes.update_datalim(ax1_lim)
@@ -244,6 +245,22 @@ class MainFrame(ttk.Frame):
                 axes.relim()
             axes.autoscale(enable=True, axis="y", tight=True)
             figure_canvas.draw()
+
+            fig1 = plt.Figure()
+            t = np.arange(0, 30, dt)
+
+            def animate(i):
+                # line.set_ydata(np.sin(t + i / 10.0))  # update the data
+                line1.set_ydata(theta_0 * np.cos(np.sqrt(g / l) * (t + i / 10.0)))  # update the data
+                return line1,
+
+            canvas = FigureCanvasTkAgg(fig1, master=self)
+            canvas.get_tk_widget().grid(column=0, row=22, rowspan=10, columnspan=10, padx=10, pady=20)
+
+            ax = fig1.add_subplot(111)
+            line1, = ax.plot(t, theta_0 * np.cos(np.sqrt(g / l) * t))
+            ani = animation.FuncAnimation(fig1, animate, np.arange(1, 200), interval=25, blit=True)
+            plt.show(False)
 
         # get length of pendulum
         ttk.Label(self, text="Length: ") \
