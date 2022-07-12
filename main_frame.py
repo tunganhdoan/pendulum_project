@@ -24,6 +24,20 @@ class MainFrame(ttk.Frame):
         self.columnconfigure(2, weight=4)
         self.columnconfigure(3, weight=4)
         self.columnconfigure(4, weight=4)
+        # TK common variables
+        length = tk.DoubleVar(value=2.0)
+        mass = tk.DoubleVar(value=1)
+        gravity = tk.DoubleVar(value=9.8)
+        initial_angle = tk.DoubleVar(value=1.0)
+        angle_choice = tk.IntVar(value=0)
+        initial_angular_velocity = tk.DoubleVar(value=0.0)
+        velocity_choice = tk.IntVar(value=1)
+        damping = tk.DoubleVar(value=0.0)
+        force_amplitude = tk.DoubleVar(value=0.0)
+        force_frequency = tk.DoubleVar(value=0.0)
+        time_step = tk.DoubleVar(value=0.01)
+        time_rate = tk.DoubleVar(value=0.0)
+        dropdown_value = tk.StringVar(self)
 
         def length_slider_changed(event):
             length.set(round(length.get(), 1))
@@ -214,7 +228,7 @@ class MainFrame(ttk.Frame):
             figure_canvas.draw()
 
         # get length of pendulum
-        length = tk.DoubleVar(value=2.0)
+
 
         ttk.Label(self, text="Length: ") \
             .grid(column=0, row=0, sticky=tk.E, **options)
@@ -228,7 +242,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=0, sticky=tk.W, **options)
 
         # get mass of pendulum
-        mass = tk.DoubleVar(value=1)
+
 
         ttk.Label(self, text="Mass: ") \
             .grid(column=0, row=1, sticky=tk.E, **options)
@@ -242,7 +256,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=1, sticky=tk.W, **options)
 
         # get gravity of pendulum
-        gravity = tk.DoubleVar(value=9.8)
+
 
         ttk.Label(self, text="Gravity: ") \
             .grid(column=0, row=2, sticky=tk.E, **options)
@@ -256,7 +270,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=2, sticky=tk.W, **options)
 
         # get initial_angle of pendulum
-        initial_angle = tk.DoubleVar(value=1.0)
+
 
         ttk.Label(self, text="Initial Angle") \
             .grid(column=0, row=3, sticky=tk.E, **options)
@@ -266,7 +280,7 @@ class MainFrame(ttk.Frame):
         ttk.Spinbox(self, textvariable=initial_angle, command=initial_angle_spinbox_changed,
                     increment=0.1, wrap=True, width=5, from_=1, to=50) \
             .grid(column=2, row=3, sticky=tk.W, **options)
-        angle_choice = tk.IntVar(value=0)
+
         # Dictionary to create multiple buttons
         rad_vs_degree = {"rad": 0, "degree": 1}
         for (text, choice_value) in rad_vs_degree.items():
@@ -275,7 +289,7 @@ class MainFrame(ttk.Frame):
                 .grid(column=4 + int(choice_value), row=3, sticky=tk.W, **options)
 
         # get initial_angular_velocity of pendulum
-        initial_angular_velocity = tk.DoubleVar(value=0.0)
+
 
         ttk.Label(self, text="Initial Angular Velocity:") \
             .grid(column=0, row=4, sticky=tk.E, **options)
@@ -286,7 +300,7 @@ class MainFrame(ttk.Frame):
         ttk.Spinbox(self, textvariable=initial_angular_velocity, command=initial_angular_velocity_spinbox_changed,
                     increment=0.1, wrap=True, width=5, from_=1, to=50) \
             .grid(column=2, row=4, sticky=tk.W, **options)
-        velocity_choice = tk.IntVar(value=1)
+
         # Dictionary to create multiple buttons
         rads_vs_degrees = {"rad/s": 1, "degree/s": 2}
         for (text, rads_vs_degrees) in rads_vs_degrees.items():
@@ -294,7 +308,7 @@ class MainFrame(ttk.Frame):
                 .grid(column=3 + int(rads_vs_degrees), row=4, sticky=tk.W, **options)
 
         # get damping of pendulum
-        damping = tk.DoubleVar(value=0.0)
+
 
         ttk.Label(self, text="Damping: ") \
             .grid(column=0, row=5, sticky=tk.E, **options)
@@ -306,7 +320,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=5, sticky=tk.W, **options)
 
         # get force_amplitude of pendulum
-        force_amplitude = tk.DoubleVar(value=0.0)
+
 
         ttk.Label(self, text="Force Amplitude: ") \
             .grid(column=0, row=6, sticky=tk.E, **options)
@@ -318,7 +332,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=6, sticky=tk.W, **options)
 
         # get force_frequency of pendulum
-        force_frequency = tk.DoubleVar(value=0.0)
+
 
         ttk.Label(self, text="Force Frequency: ") \
             .grid(column=0, row=7, sticky=tk.E, **options)
@@ -330,7 +344,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=7, sticky=tk.W, **options)
 
         # set time_step of pendulum
-        time_step = tk.DoubleVar(value=0.01)
+
 
         ttk.Label(self, text="Time Step: ") \
             .grid(column=0, row=8, sticky=tk.E, **options)
@@ -342,7 +356,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=8, sticky=tk.W, **options)
 
         # set time_rate of pendulum
-        time_rate = tk.DoubleVar(value=0.0)
+
 
         ttk.Label(self, text="Time Rate: ") \
             .grid(column=0, row=9, sticky=tk.E, **options)
@@ -354,7 +368,7 @@ class MainFrame(ttk.Frame):
             .grid(column=2, row=9, sticky=tk.W, **options)
 
         # Create a Tkinter dropdown
-        dropdown_value = tk.StringVar(self)
+
 
         # Dictionary with options
         choices = ['Small angles', 'Euler', 'Improved Euler', 'RK4']
