@@ -83,7 +83,7 @@ class MainFrame(ttk.Frame):
         self.theta = self.initial_angle.get() * np.cos(
             np.sqrt(self.gravity.get() / self.length.get()) * self.t)
         self.line1, = self.ax.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black', color='black')
-        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=50, markerfacecolor='black', color='black')
+        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black', color='black')
         self.ani = animation.FuncAnimation(self.fig, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
                                            interval=self.time_rate.get(), blit=True)
         plt.show()
@@ -96,7 +96,7 @@ class MainFrame(ttk.Frame):
         self.theta = self.initial_angle.get() * np.cos(
             np.sqrt(self.gravity.get() / self.length.get()) * self.t)
         self.ani_line1, = self.ani_ax1.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black', color='black')
-        self.point, = self.ani_ax1.plot([self.t[0]], [self.theta[0]],  'o', markersize=50, markerfacecolor='black')
+        self.point, = self.ani_ax1.plot([self.t[0]], [self.theta[0]],  'o', markersize=15, markerfacecolor='black')
         self.ani_ani1 = animation.FuncAnimation(self.ani_fig1, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
                                            interval=self.time_rate.get(), blit=True)
         plt.show()
@@ -256,32 +256,32 @@ class MainFrame(ttk.Frame):
     def length_slider_changed(self, passed_value):
 
         self.length.set(round(float(passed_value), 1))
-        self.update()
+        self.update_data()
 
     def length_spinbox_changed(self):
 
         self.length.set(round(self.length.get(), 1))
-        self.update()
+        self.update_data()
 
     def mass_slider_changed(self, passed_value):
 
         self.mass.set(round(float(passed_value), 1))
-        self.update()
+        self.update_data()
 
     def mass_spinbox_changed(self):
 
         self.mass.set(round(self.mass.get(), 1))
-        self.update()
+        self.update_data()
 
     def gravity_slider_changed(self, passed_value):
 
         self.gravity.set(round(float(passed_value), 1))
-        self.update()
+        self.update_data()
 
     def gravity_spinbox_changed(self):
 
         self.gravity.set(round(self.gravity.get(), 1))
-        self.update()
+        self.update_data()
 
     def initial_angle_slider_changed(self, passed_value):
 
@@ -290,7 +290,7 @@ class MainFrame(ttk.Frame):
             self.initial_angle.set(round(temp_rad, 1))
         else:
             self.initial_angle.set(round(float(passed_value), 1))
-        self.update()
+        self.update_data()
 
     def initial_angle_spinbox_changed(self):
 
@@ -299,7 +299,7 @@ class MainFrame(ttk.Frame):
             self.initial_angle.set(round(temp_rad, 1))
         else:
             self.initial_angle.set(round(self.initial_angle.get(), 1))
-        self.update()
+        self.update_data()
 
     def initial_angle_choice_changed(self):
 
@@ -308,79 +308,79 @@ class MainFrame(ttk.Frame):
             self.initial_angle.set(round(temp_rad, 1))
         else:
             self.initial_angle.set(round(self.initial_angle.get(), 1))
-        self.update()
+        self.update_data()
 
     def initial_angular_velocity_slider_changed(self, passed_value):
 
         self.initial_angular_velocity.set(round(float(passed_value), 1))
-        self.update()
+        self.update_data()
 
     def initial_angular_velocity_spinbox_changed(self):
 
         self.initial_angular_velocity.set(round(self.initial_angular_velocity.get(), 1))
-        self.update()
+        self.update_data()
 
     def damping_slider_changed(self, passed_value):
 
         self.damping.set(round(float(passed_value), 1))
-        self.update()
+        self.update_data()
 
     def damping_spinbox_changed(self):
 
         self.damping.set(round(self.damping.get(), 1))
-        self.update()
+        self.update_data()
 
     def force_amplitude_slider_changed(self, passed_value):
 
         self.force_amplitude.set(round(float(passed_value), 1))
-        self.update()
+        self.update_data()
 
     def force_amplitude_spinbox_changed(self):
 
         self.force_amplitude.set(round(self.force_amplitude.get(), 1))
-        self.update()
+        self.update_data()
 
     def force_frequency_slider_changed(self, passed_value):
 
         self.force_frequency.set(round(float(passed_value), 1))
-        self.update()
+        self.update_data()
 
     def force_frequency_spinbox_changed(self):
 
         self.force_frequency.set(round(self.force_frequency.get(), 1))
-        self.update()
+        self.update_data()
 
     def time_step_slider_changed(self, passed_value):
 
         self.time_step.set(round(float(passed_value), 2))
-        self.update()
+        self.update_data()
 
     def time_step_spinbox_changed(self):
         time.sleep(1)
         self.time_step.set(round(self.time_step.get(), 2))
-        self.update()
+        self.update_data()
 
     def time_rate_slider_changed(self, passed_value):
 
         self.time_rate.set(round(float(passed_value), 2))
-        self.update()
+        self.update_data()
 
     def time_rate_spinbox_changed(self):
 
         self.time_rate.set(round(self.time_rate.get(), 2))
-        self.update()
+        self.update_data()
 
     def popup_menu_changed(self, passed_value):
-        self.update()
+        self.update_data()
 
     def autoscale_cb_changed(self):
-        self.update()
+        self.update_data()
 
     def show_animation(self):
-        self.update()
+        self.update_data()
         self.update_plot()
 
-    def update(self):
+    def update_data(self):
 
         t_initial = 0
         t_stop = 30
@@ -458,7 +458,7 @@ class MainFrame(ttk.Frame):
             np.sqrt(self.gravity.get() / self.length.get()) * self.t)
 
         self.line1, = self.ax.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black')
-        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=50, markerfacecolor='black')
+        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black')
 
         self.ani = animation.FuncAnimation(self.fig, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
                                            interval=self.time_rate.get() / 10, blit=True)
