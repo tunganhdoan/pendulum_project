@@ -18,6 +18,7 @@ from matplotlib.backends.backend_tkagg import (
 class MainFrame(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
+        # Config theme styles
         options = dict(padx=5, pady=5)
         set_font = "Bahnschrift 15 bold"
         self.option_add("*font", set_font)
@@ -27,6 +28,11 @@ class MainFrame(ttk.Frame):
         self.columnconfigure(2, weight=4)
         self.columnconfigure(3, weight=4)
         self.columnconfigure(4, weight=4)
+        style.configure("TMenubutton", font=set_font)
+        style.configure("TRadiobutton", font=set_font)
+        style.configure('TMenubutton', borderwidth=1)
+        self.grid(padx=50, pady=50, sticky=tk.NSEW)
+
         # TK common variables
         self.length = tk.DoubleVar(value=2.0)
         self.mass = tk.DoubleVar(value=1)
@@ -42,7 +48,7 @@ class MainFrame(ttk.Frame):
         self.time_rate = tk.DoubleVar(value=0.01)
         self.dropdown_value = tk.StringVar(self)
         self.autoscale = tk.IntVar()
-
+        # INTERMEDIATE VARIABLES
         self.t = np.arange(0, 30, self.time_step.get())
         self.theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * self.t)
         # STATIC FIGURE 1
@@ -66,11 +72,11 @@ class MainFrame(ttk.Frame):
         self.fig = plt.Figure()
         self.t = np.arange(0, 30, self.time_step.get())
 
-        def animate(i):
-            # line.set_ydata(np.sin(t + i / 10.0))  # update the data
-            self.line1.set_ydata(self.initial_angle.get() * np.cos(
-                np.sqrt(self.gravity.get() / self.length.get()) * (self.t + i / (1 / self.time_step.get()))))
-            return self.line1,
+        # def animate(i):
+        #     # line.set_ydata(np.sin(t + i / 10.0))  # update the data
+        #     self.line1.set_ydata(self.initial_angle.get() * np.cos(
+        #         np.sqrt(self.gravity.get() / self.length.get()) * (self.t + i / (1 / self.time_step.get()))))
+        #     return self.line1,
 
         def update_point(n, x, y, point):
             point.set_data(np.array([x[n], y[n]]))
@@ -83,7 +89,8 @@ class MainFrame(ttk.Frame):
         self.theta = self.initial_angle.get() * np.cos(
             np.sqrt(self.gravity.get() / self.length.get()) * self.t)
         self.line1, = self.ax.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black', color='black')
-        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black', color='black')
+        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black',
+                                   color='black')
         self.ani = animation.FuncAnimation(self.fig, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
                                            interval=self.time_rate.get(), blit=True)
         plt.show()
@@ -95,17 +102,18 @@ class MainFrame(ttk.Frame):
         self.ani_ax1 = self.ani_fig1.add_subplot(111)
         self.theta = self.initial_angle.get() * np.cos(
             np.sqrt(self.gravity.get() / self.length.get()) * self.t)
-        self.ani_line1, = self.ani_ax1.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black', color='black')
-        self.point, = self.ani_ax1.plot([self.t[0]], [self.theta[0]],  'o', markersize=15, markerfacecolor='black')
-        self.ani_ani1 = animation.FuncAnimation(self.ani_fig1, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
-                                           interval=self.time_rate.get(), blit=True)
+        self.ani_line1, = self.ani_ax1.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black',
+                                            color='black')
+        self.point, = self.ani_ax1.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black')
+        self.ani_ani1 = animation.FuncAnimation(self.ani_fig1, update_point, len(self.t),
+                                                fargs=(self.t, self.theta, self.point),
+                                                interval=self.time_rate.get(), blit=True)
         plt.show()
-
 
         tk.Checkbutton(self, text='autoscale', variable=self.autoscale, onvalue=1, offvalue=0,
                        command=self.autoscale_cb_changed) \
             .grid(column=10, row=9, padx=10, pady=0)
-
+        # INPUT WIDGETS
         # get length of pendulum
         ttk.Label(self, text="Length: ") \
             .grid(column=0, row=0, sticky=tk.E, **options)
@@ -247,44 +255,32 @@ class MainFrame(ttk.Frame):
         # link function to change dropdown
         self.dropdown_value.trace('w', change_dropdown)
 
-        style.configure("TMenubutton", font=set_font)
-        style.configure("TRadiobutton", font=set_font)
-        style.configure('TMenubutton', borderwidth=1)
-
-        self.grid(padx=50, pady=50, sticky=tk.NSEW)
-
+    # Widget changed function handler
     def length_slider_changed(self, passed_value):
-
         self.length.set(round(float(passed_value), 1))
         self.update_data()
 
     def length_spinbox_changed(self):
-
         self.length.set(round(self.length.get(), 1))
         self.update_data()
 
     def mass_slider_changed(self, passed_value):
-
         self.mass.set(round(float(passed_value), 1))
         self.update_data()
 
     def mass_spinbox_changed(self):
-
         self.mass.set(round(self.mass.get(), 1))
         self.update_data()
 
     def gravity_slider_changed(self, passed_value):
-
         self.gravity.set(round(float(passed_value), 1))
         self.update_data()
 
     def gravity_spinbox_changed(self):
-
         self.gravity.set(round(self.gravity.get(), 1))
         self.update_data()
 
     def initial_angle_slider_changed(self, passed_value):
-
         if self.angle_choice.get() == 1:
             temp_rad = math.radians(float(passed_value))
             self.initial_angle.set(round(temp_rad, 1))
@@ -293,7 +289,6 @@ class MainFrame(ttk.Frame):
         self.update_data()
 
     def initial_angle_spinbox_changed(self):
-
         if self.angle_choice.get() == 1:
             temp_rad = math.radians(self.initial_angle.get())
             self.initial_angle.set(round(temp_rad, 1))
@@ -302,7 +297,6 @@ class MainFrame(ttk.Frame):
         self.update_data()
 
     def initial_angle_choice_changed(self):
-
         if self.angle_choice.get() == 1:
             temp_rad = math.radians(self.initial_angle.get())
             self.initial_angle.set(round(temp_rad, 1))
@@ -311,47 +305,38 @@ class MainFrame(ttk.Frame):
         self.update_data()
 
     def initial_angular_velocity_slider_changed(self, passed_value):
-
         self.initial_angular_velocity.set(round(float(passed_value), 1))
         self.update_data()
 
     def initial_angular_velocity_spinbox_changed(self):
-
         self.initial_angular_velocity.set(round(self.initial_angular_velocity.get(), 1))
         self.update_data()
 
     def damping_slider_changed(self, passed_value):
-
         self.damping.set(round(float(passed_value), 1))
         self.update_data()
 
     def damping_spinbox_changed(self):
-
         self.damping.set(round(self.damping.get(), 1))
         self.update_data()
 
     def force_amplitude_slider_changed(self, passed_value):
-
         self.force_amplitude.set(round(float(passed_value), 1))
         self.update_data()
 
     def force_amplitude_spinbox_changed(self):
-
         self.force_amplitude.set(round(self.force_amplitude.get(), 1))
         self.update_data()
 
     def force_frequency_slider_changed(self, passed_value):
-
         self.force_frequency.set(round(float(passed_value), 1))
         self.update_data()
 
     def force_frequency_spinbox_changed(self):
-
         self.force_frequency.set(round(self.force_frequency.get(), 1))
         self.update_data()
 
     def time_step_slider_changed(self, passed_value):
-
         self.time_step.set(round(float(passed_value), 2))
         self.update_data()
 
@@ -361,12 +346,10 @@ class MainFrame(ttk.Frame):
         self.update_data()
 
     def time_rate_slider_changed(self, passed_value):
-
         self.time_rate.set(round(float(passed_value), 2))
         self.update_data()
 
     def time_rate_spinbox_changed(self):
-
         self.time_rate.set(round(self.time_rate.get(), 2))
         self.update_data()
 
@@ -380,8 +363,8 @@ class MainFrame(ttk.Frame):
         self.update_data()
         self.update_plot()
 
+    # UPDATE DATA AND UPDATE PLOT
     def update_data(self):
-
         t_initial = 0
         t_stop = 30
         t = np.arange(t_initial, t_stop, self.time_step.get())
@@ -434,16 +417,17 @@ class MainFrame(ttk.Frame):
 
     def update_plot(self):
         time.sleep(1)
-        def init():
-            self.line1.set_ydata(self.initial_angle.get() * np.cos(
-                np.sqrt(self.gravity.get() / self.length.get()) * self.t))
-            # time_text.set_text('')
-            return self.line1,
 
-        def animate(i):
-            self.line1.set_ydata(self.initial_angle.get() * np.cos(
-                np.sqrt(self.gravity.get() / self.length.get()) * (self.t + i / 10)))
-            return self.line1,
+        # def init():
+        #     self.line1.set_ydata(self.initial_angle.get() * np.cos(
+        #         np.sqrt(self.gravity.get() / self.length.get()) * self.t))
+        #     # time_text.set_text('')
+        #     return self.line1,
+
+        # def animate(i):
+        #     self.line1.set_ydata(self.initial_angle.get() * np.cos(
+        #         np.sqrt(self.gravity.get() / self.length.get()) * (self.t + i / 10)))
+        #     return self.line1,
 
         def update_point(n, x, y, point):
             point.set_data(np.array([x[n], y[n]]))
