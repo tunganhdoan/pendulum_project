@@ -45,10 +45,11 @@ class MainFrame(ttk.Frame):
 
         self.t = np.arange(0, 30, self.time_step.get())
         self.theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * self.t)
+        # STATIC FIGURE 1
         self.figure = Figure(constrained_layout=True, figsize=(3, 3), dpi=100)
         self.figure.patch.set_facecolor('whitesmoke')
         self.axes = self.figure.add_subplot()
-        self.line, = self.axes.plot(self.t, self.theta, 'g', label='plot')
+        self.line, = self.axes.plot(self.t, self.theta, 'k', label='plot')
         self.axes.autoscale(enable=None, axis="x", tight=False)
         self.axes.set_title('Harmonic motion')
         self.axes.set_xlabel('Time')
@@ -61,6 +62,7 @@ class MainFrame(ttk.Frame):
         # create axes
         self.figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=20, columnspan=20, padx=10, pady=20)
 
+        # ANIMATING FIGURE 1
         self.fig = plt.Figure()
         self.t = np.arange(0, 30, self.time_step.get())
 
@@ -80,11 +82,25 @@ class MainFrame(ttk.Frame):
         self.ax = self.fig.add_subplot(111)
         self.theta = self.initial_angle.get() * np.cos(
             np.sqrt(self.gravity.get() / self.length.get()) * self.t)
-        self.line1, = self.ax.plot(self.t, self.theta, linestyle='dotted')
-        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o')
+        self.line1, = self.ax.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black', color='black')
+        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=50, markerfacecolor='black', color='black')
         self.ani = animation.FuncAnimation(self.fig, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
                                            interval=self.time_rate.get(), blit=True)
         plt.show()
+
+        # ANIMATING FIGURE 2
+        self.ani_fig1 = plt.Figure()
+        self.ani_canvas1 = FigureCanvasTkAgg(self.ani_fig1, master=self)
+        self.ani_canvas1.get_tk_widget().grid(column=8, row=22, rowspan=10, columnspan=10, padx=10, pady=20)
+        self.ani_ax1 = self.ani_fig1.add_subplot(111)
+        self.theta = self.initial_angle.get() * np.cos(
+            np.sqrt(self.gravity.get() / self.length.get()) * self.t)
+        self.ani_line1, = self.ani_ax1.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black', color='black')
+        self.point, = self.ani_ax1.plot([self.t[0]], [self.theta[0]],  'o', markersize=50, markerfacecolor='black')
+        self.ani_ani1 = animation.FuncAnimation(self.ani_fig1, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
+                                           interval=self.time_rate.get(), blit=True)
+        plt.show()
+
 
         tk.Checkbutton(self, text='autoscale', variable=self.autoscale, onvalue=1, offvalue=0,
                        command=self.autoscale_cb_changed) \
@@ -211,7 +227,7 @@ class MainFrame(ttk.Frame):
                     increment=0.01, wrap=True, width=5, from_=0.01, to=0.1) \
             .grid(column=2, row=9, sticky=tk.W, **options)
         ttk.Button(self, text='Update animation plot', command=self.show_animation) \
-            .grid(column=3, row=10, sticky=tk.E, **options)
+            .grid(column=4, row=10, sticky=tk.E, **options)
 
         # Create a Tkinter dropdown
         # Dictionary with options
@@ -441,8 +457,8 @@ class MainFrame(ttk.Frame):
         self.theta = self.initial_angle.get() * np.cos(
             np.sqrt(self.gravity.get() / self.length.get()) * self.t)
 
-        self.line1, = self.ax.plot(self.t, self.theta, linestyle='dotted')
-        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o')
+        self.line1, = self.ax.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black')
+        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=50, markerfacecolor='black')
 
         self.ani = animation.FuncAnimation(self.fig, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
                                            interval=self.time_rate.get() / 10, blit=True)
