@@ -7,12 +7,11 @@ import matplotlib
 import numpy as np
 from matplotlib import animation
 from matplotlib import pyplot as plt
-
-matplotlib.use('TkAgg')
-
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.figure import Figure
+
+matplotlib.use('TkAgg')
 
 
 class MainFrame(ttk.Frame):
@@ -31,7 +30,7 @@ class MainFrame(ttk.Frame):
         style.configure("TMenubutton", font=set_font)
         style.configure("TRadiobutton", font=set_font)
         style.configure('TMenubutton', borderwidth=1)
-        self.grid(padx=50, pady=50, sticky=tk.NSEW)
+        self.grid(padx=20, pady=20, sticky=tk.NSEW)
 
         # TK common variables
         self.length = tk.DoubleVar(value=2.0)
@@ -39,7 +38,7 @@ class MainFrame(ttk.Frame):
         self.gravity = tk.DoubleVar(value=9.8)
         self.initial_angle = tk.DoubleVar(value=1.0)
         self.angle_choice = tk.IntVar(value=0)
-        self.initial_angular_velocity = tk.DoubleVar(value=0.0)
+        self.initial_velocity = tk.DoubleVar(value=0.0)
         self.velocity_choice = tk.IntVar(value=1)
         self.damping = tk.DoubleVar(value=0.0)
         self.force_amplitude = tk.DoubleVar(value=0.0)
@@ -51,6 +50,8 @@ class MainFrame(ttk.Frame):
         # INTERMEDIATE VARIABLES
         self.t = np.arange(0, 30, self.time_step.get())
         self.theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * self.t)
+        self.t_initial = 0
+        self.t_stop = 30
         # STATIC FIGURE 1
         self.figure = Figure(constrained_layout=True, figsize=(3, 3), dpi=100)
         self.figure.patch.set_facecolor('whitesmoke')
@@ -66,11 +67,11 @@ class MainFrame(ttk.Frame):
         self.toolbar = NavigationToolbar2Tk(self.figure_canvas, self, pack_toolbar=False)
         self.toolbar.update()
         # create axes
-        self.figure_canvas.get_tk_widget().grid(column=10, row=0, rowspan=20, columnspan=20, padx=10, pady=20)
+        self.figure_canvas.get_tk_widget().grid(column=5, row=0, rowspan=10, columnspan=10, padx=10, pady=10)
 
         # ANIMATING FIGURE 1
         self.fig = plt.Figure()
-        self.t = np.arange(0, 30, self.time_step.get())
+        self.t = np.arange(self.t_initial, self.t_stop, self.time_step.get())
 
         # def animate(i):
         #     # line.set_ydata(np.sin(t + i / 10.0))  # update the data
@@ -100,19 +101,55 @@ class MainFrame(ttk.Frame):
         self.ani_canvas1 = FigureCanvasTkAgg(self.ani_fig1, master=self)
         self.ani_canvas1.get_tk_widget().grid(column=8, row=22, rowspan=10, columnspan=10, padx=10, pady=20)
         self.ani_ax1 = self.ani_fig1.add_subplot(111)
-        self.theta = self.initial_angle.get() * np.cos(
-            np.sqrt(self.gravity.get() / self.length.get()) * self.t)
-        self.ani_line1, = self.ani_ax1.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black',
-                                            color='black')
-        self.point, = self.ani_ax1.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black')
-        self.ani_ani1 = animation.FuncAnimation(self.ani_fig1, update_point, len(self.t),
-                                                fargs=(self.t, self.theta, self.point),
-                                                interval=self.time_rate.get(), blit=True)
+        ani_ax1_lim = ((-10, -10), (10, 10))
+        self.ani_ax1.update_datalim(ani_ax1_lim)
+        self.ani_ax1.axis('equal')
+        self.ani_ax1.set_xlabel('X')  # x label
+        self.ani_ax1.set_ylabel('Y')  # y label
+        # create a plot on those axes, which is currently empty
+        self.t = np.arange(self.t_initial, self.t_stop, self.time_step.get())
+        # Initialize a vector of zeros
+        theta_vec = np.zeros(len(self.t))
+        v_vec = np.zeros(len(self.t))
+        # Set our initial condition
+        theta_vec[0] = self.initial_angle.get()  # initial angle
+        v_vec[0] = self.initial_velocity.get()  # initial angular velocity
+        # Loop through time
+        # Small angle approximation method
+
+        # Euler's Method (approximately integrates the differential equation)
+        # for i in range(1, len(self.t)):
+        #     theta_vec[i] = theta_vec[i - 1] + v_vec[i - 1] * self.time_step.get()
+        #     v_vec[i] = v_vec[i - 1] + (-self.gravity.get() / self.length.get() * np.sin(theta_vec[i - 1])) * \
+        #                self.time_step.get()
+        theta_vec = self.theta
+        # create a plot on those axes, which is currently empty
+        # self.ani_point1, = self.ani_ax1.plot([], [], color='mediumblue')  # initializes an empty plot
+        # Now we want to plot stuff
+        # Now we're putting the rod and bob in the right place
+        # initialize an array containing the positions of the pendulum
+        simulation_size = len(self.t)  # number of sim time points
+        x_pendulum = np.zeros(simulation_size)
+        y_pendulum = np.zeros(simulation_size)
+
+        for i in range(0, simulation_size):
+            x_pendulum[i] = self.length.get() * np.sin(theta_vec[i])
+            y_pendulum[i] = -self.length.get() * np.cos(theta_vec[i])
+
+        def update_bob(n, x, y, bob, arm):
+            bob.set_data(np.array([x[n], y[n]]))
+            arm.set_data(np.array(([0, x[n]], [0, y[n]])))
+            return arm, bob,
+
+        # self.ani_line1, = self.ani_ax1.plot(x_pendulum, y_pendulum, 'k', label='plot')
+        self.ani_point1, = self.ani_ax1.plot([x_pendulum[0]], [y_pendulum[0]], 'o',
+                                             markersize=15, markerfacecolor='black')
+        self.ani_arm1, = self.ani_ax1.plot([0, x_pendulum[0]], [0, y_pendulum[0]])
+        self.ani_bob_1 = animation.FuncAnimation(self.ani_fig1, update_bob, len(x_pendulum),
+                                                     fargs=(x_pendulum, y_pendulum, self.ani_point1, self.ani_arm1),
+                                                     interval=self.time_rate.get(), blit=True)
         plt.show()
 
-        tk.Checkbutton(self, text='autoscale', variable=self.autoscale, onvalue=1, offvalue=0,
-                       command=self.autoscale_cb_changed) \
-            .grid(column=10, row=9, padx=10, pady=0)
         # INPUT WIDGETS
         # get length of pendulum
         ttk.Label(self, text="Length: ") \
@@ -168,22 +205,16 @@ class MainFrame(ttk.Frame):
                 .grid(column=4 + int(choice_value), row=3, sticky=tk.W, **options)
 
         # get initial_angular_velocity of pendulum
-        ttk.Label(self, text="Initial Angular Velocity:") \
+        ttk.Label(self, text="Initial Velocity:") \
             .grid(column=0, row=4, sticky=tk.E, **options)
 
-        ttk.Scale(self, variable=self.initial_angular_velocity, command=self.initial_angular_velocity_slider_changed,
+        ttk.Scale(self, variable=self.initial_velocity, command=self.initial_velocity_slider_changed,
                   orient='horizontal', length=150, from_=1, to=50) \
             .grid(column=1, row=4, sticky=tk.W, **options)
-        ttk.Spinbox(self, textvariable=self.initial_angular_velocity,
-                    command=self.initial_angular_velocity_spinbox_changed,
+        ttk.Spinbox(self, textvariable=self.initial_velocity,
+                    command=self.initial_velocity_spinbox_changed,
                     increment=0.1, wrap=True, width=5, from_=1, to=50) \
             .grid(column=2, row=4, sticky=tk.W, **options)
-
-        # Dictionary to create multiple buttons
-        rads_vs_degrees = {"rad/s": 1, "degree/s": 2}
-        for (text, rads_vs_degrees) in rads_vs_degrees.items():
-            ttk.Radiobutton(self, text=text, variable=self.velocity_choice, value=rads_vs_degrees) \
-                .grid(column=3 + int(rads_vs_degrees), row=4, sticky=tk.W, **options)
 
         # get damping of pendulum
         ttk.Label(self, text="Damping: ") \
@@ -235,7 +266,7 @@ class MainFrame(ttk.Frame):
                     increment=0.01, wrap=True, width=5, from_=0.01, to=0.1) \
             .grid(column=2, row=9, sticky=tk.W, **options)
         ttk.Button(self, text='Update animation plot', command=self.show_animation) \
-            .grid(column=4, row=10, sticky=tk.E, **options)
+            .grid(column=4, row=10, columnspan=2, sticky=tk.E, **options)
 
         # Create a Tkinter dropdown
         # Dictionary with options
@@ -247,6 +278,9 @@ class MainFrame(ttk.Frame):
         popup_menu.grid(row=10, column=1)
         # set the default option
         popup_menu.config(width=menu_width)
+        tk.Checkbutton(self, text='autoscale', variable=self.autoscale, onvalue=1, offvalue=0,
+                       command=self.autoscale_cb_changed) \
+            .grid(column=10, row=9, padx=10, pady=0)
 
         def change_dropdown(*args):
             pass
@@ -304,12 +338,12 @@ class MainFrame(ttk.Frame):
             self.initial_angle.set(round(self.initial_angle.get(), 1))
         self.update_data()
 
-    def initial_angular_velocity_slider_changed(self, passed_value):
-        self.initial_angular_velocity.set(round(float(passed_value), 1))
+    def initial_velocity_slider_changed(self, passed_value):
+        self.initial_velocity.set(round(float(passed_value), 1))
         self.update_data()
 
-    def initial_angular_velocity_spinbox_changed(self):
-        self.initial_angular_velocity.set(round(self.initial_angular_velocity.get(), 1))
+    def initial_velocity_spinbox_changed(self):
+        self.initial_velocity.set(round(self.initial_velocity.get(), 1))
         self.update_data()
 
     def damping_slider_changed(self, passed_value):
@@ -365,9 +399,7 @@ class MainFrame(ttk.Frame):
 
     # UPDATE DATA AND UPDATE PLOT
     def update_data(self):
-        t_initial = 0
-        t_stop = 30
-        t = np.arange(t_initial, t_stop, self.time_step.get())
+        self.t = np.arange(self.t_initial, self.t_stop, self.time_step.get())
 
         # Catch the choice of numerical method
         def euler(dt, v, i_theta):
@@ -388,23 +420,22 @@ class MainFrame(ttk.Frame):
             return temp_list
 
         if self.dropdown_value.get() == 'Small angles':
-            theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * t)
+            theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * self.t)
         elif self.dropdown_value.get() == 'Euler':
-            euler_list = []
-            euler_list = euler_array(self.initial_angular_velocity.get(), self.initial_angle.get(), t_initial, t_stop)
+            euler_list = euler_array(self.initial_velocity.get(), self.initial_angle.get(), self.t_initial, self.t_stop)
             t = [x[0] for x in euler_list]
             theta = [x[1] for x in euler_list]
         elif self.dropdown_value.get() == 'Improved Euler':
-            theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * t)
+            theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * self.t)
         elif self.dropdown_value.get() == 'RK4':
-            theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * t)
+            theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * self.t)
         else:
-            theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * t)
+            theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * self.t)
 
-        self.line.set_data(t, theta)
+        self.line.set_data(self.t, theta)
 
         if self.autoscale.get() == 0:
-            ax1_lim = ((min(t), min(theta)), (max(t), max(theta)))
+            ax1_lim = ((min(self.t), min(theta)), (max(self.t), max(theta)))
             self.axes.update_datalim(ax1_lim)
         else:
             self.axes.relim()
@@ -412,8 +443,8 @@ class MainFrame(ttk.Frame):
         self.figure_canvas.draw()
         plt.ion()
         self.fig = plt.Figure()
-
-        self.t = np.arange(0, 30, self.time_step.get())
+        # setting for animation 2
+        self.ani_ax1.autoscale(enable=True, axis="both", tight=True)
 
     def update_plot(self):
         time.sleep(1)
@@ -428,7 +459,6 @@ class MainFrame(ttk.Frame):
         #     self.line1.set_ydata(self.initial_angle.get() * np.cos(
         #         np.sqrt(self.gravity.get() / self.length.get()) * (self.t + i / 10)))
         #     return self.line1,
-
         def update_point(n, x, y, point):
             point.set_data(np.array([x[n], y[n]]))
             return point,
@@ -445,5 +475,62 @@ class MainFrame(ttk.Frame):
         self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black')
 
         self.ani = animation.FuncAnimation(self.fig, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
-                                           interval=self.time_rate.get() / 10, blit=True)
+                                           interval=self.time_rate.get(), blit=True)
         plt.show()
+
+        # 2nd
+        self.ani_fig1 = plt.Figure()
+        self.ani_canvas1 = FigureCanvasTkAgg(self.ani_fig1, master=self)
+        self.ani_canvas1.get_tk_widget().grid(column=8, row=22, rowspan=10, columnspan=10, padx=10, pady=20)
+        self.ani_ax1 = self.ani_fig1.add_subplot(111)
+        ani_ax1_lim = ((-10, -10), (10, 10))
+        self.ani_ax1.update_datalim(ani_ax1_lim)
+        self.ani_ax1.axis('equal')
+        self.ani_ax1.set_xlabel('X')  # x label
+        self.ani_ax1.set_ylabel('Y')  # y label
+        # create a plot on those axes, which is currently empty
+        self.t = np.arange(0, 30, self.time_step.get())
+        # Initialize a vector of zeros
+        theta_vec = np.zeros(len(self.t))
+        v_vec = np.zeros(len(self.t))
+        # Set our initial condition
+        theta_vec[0] = self.initial_angle.get()  # initial angle
+        v_vec[0] = self.initial_velocity.get()  # initial angular velocity
+        # Loop through time
+        # Small angle approximation method
+
+        # Euler's Method (approximately integrates the differential equation)
+        # for i in range(1, len(self.t)):
+        #     theta_vec[i] = theta_vec[i - 1] + v_vec[i - 1] * self.time_step.get()
+        #     v_vec[i] = v_vec[i - 1] + (-self.gravity.get() / self.length.get() * np.sin(theta_vec[i - 1])) * \
+        #                self.time_step.get()
+        theta_vec = self.theta
+        # create a plot on those axes, which is currently empty
+        # self.ani_point1, = self.ani_ax1.plot([], [], color='mediumblue')  # initializes an empty plot
+        # Now we want to plot stuff
+        # Now we're putting the rod and bob in the right place
+        # initialize an array containing the positions of the pendulum
+        simulation_size = len(self.t)  # number of sim time points
+        x_pendulum = np.zeros(simulation_size)
+        y_pendulum = np.zeros(simulation_size)
+
+        for i in range(0, simulation_size):
+            x_pendulum[i] = self.length.get() * np.sin(theta_vec[i])
+            y_pendulum[i] = -self.length.get() * np.cos(theta_vec[i])
+
+        def update_bob(n, x, y, bob, arm):
+            bob.set_data(np.array([x[n], y[n]]))
+            arm.set_data(np.array(([0, x[n]], [0, y[n]])))
+            return arm, bob,
+
+        # self.ani_line1, = self.ani_ax1.plot(x_pendulum, y_pendulum, 'k', label='plot')
+        self.ani_point1, = self.ani_ax1.plot([x_pendulum[0]], [y_pendulum[0]], 'o',
+                                             markersize=15, markerfacecolor='black')
+        self.ani_arm1, = self.ani_ax1.plot([0, x_pendulum[0]], [0, y_pendulum[0]])
+        self.ani_bob_1 = animation.FuncAnimation(self.ani_fig1, update_bob,
+                                                 fargs=(x_pendulum, y_pendulum, self.ani_point1, self.ani_arm1),
+                                                 frames=len(self.theta)*5, interval=self.time_rate.get(), blit=True)
+        plt.show()
+        print(f"time step : {self.time_step.get()}")
+        print(f"time rate : {self.time_rate.get()}")
+
