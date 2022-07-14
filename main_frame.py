@@ -33,7 +33,7 @@ class MainFrame(ttk.Frame):
         self.grid(padx=20, pady=20, sticky=tk.NSEW)
 
         # TK common variables
-        self.length = tk.DoubleVar(value=2.0)
+        self.length = tk.DoubleVar(value=8.0)
         self.mass = tk.DoubleVar(value=1)
         self.gravity = tk.DoubleVar(value=9.8)
         self.initial_angle_deg = tk.DoubleVar(value=30.0)
@@ -42,13 +42,13 @@ class MainFrame(ttk.Frame):
         self.damping = tk.DoubleVar(value=0.0)
         self.force_amplitude = tk.DoubleVar(value=0.0)
         self.force_frequency = tk.DoubleVar(value=0.0)
-        self.time_step = tk.DoubleVar(value=0.01)
-        self.time_rate = tk.DoubleVar(value=0.01)
+        self.time_step = tk.DoubleVar(value=0.025)
+        self.time_rate = tk.DoubleVar(value=0.0)
         self.dropdown_value = tk.StringVar(self)
         self.autoscale = tk.IntVar(value=1)
         # INTERMEDIATE VARIABLES
         self.t_initial = 0
-        self.t_stop = 30
+        self.t_stop = 20
         self.t = np.arange(self.t_initial, self.t_stop, self.time_step.get())
         self.theta_0 = math.radians(self.initial_angle_deg.get())
         self.theta = self.theta_0 * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * self.t)
@@ -196,9 +196,9 @@ class MainFrame(ttk.Frame):
 
             # set time_rate of pendulum
             ttk.Label(self, text="Time Rate: ").grid(column=0, row=9, sticky=tk.E, **options)
-            ttk.Scale(self, variable=self.time_rate, command=time_rate_slider_changed, orient='horizontal', length=150, from_=0.01, to=0.1) \
+            ttk.Scale(self, variable=self.time_rate, command=time_rate_slider_changed, orient='horizontal', length=150, from_=0, to=0.01) \
                 .grid(column=1, row=9, sticky=tk.W, **options)
-            ttk.Spinbox(self, textvariable=self.time_rate, command=time_rate_spinbox_changed, increment=0.01, wrap=True, width=5, from_=0.01, to=0.1) \
+            ttk.Spinbox(self, textvariable=self.time_rate, command=time_rate_spinbox_changed, increment=0.001, wrap=True, width=5, from_=0, to=0.01) \
                 .grid(column=2, row=9, sticky=tk.W, **options)
             ttk.Button(self, text='Update animation plot', command=show_animation) \
                 .grid(column=4, row=10, columnspan=2, sticky=tk.E, **options)
@@ -386,7 +386,7 @@ class MainFrame(ttk.Frame):
             self.line1.set_data(self.t, self.theta)
 
         def update_plot():
-            time.sleep(1)
+            time.sleep(2)
             plot_figure_2()
             plot_figure_3()
 
