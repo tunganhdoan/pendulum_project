@@ -130,9 +130,9 @@ class MainFrame(ttk.Frame):
             # get length of pendulum
             ttk.Label(self, text="Length: ").grid(column=0, row=0, sticky=tk.E, **options)
             ttk.Label(self, text="(m)").grid(column=4, row=0, sticky=tk.W, **options)
-            ttk.Scale(self, variable=self.length, command=length_slider_changed, orient='horizontal', length=150, from_=1, to=50) \
+            ttk.Scale(self, variable=self.length, command=length_slider_changed, orient='horizontal', length=150, from_=1, to=10) \
                 .grid(column=1, row=0, sticky=tk.W, **options)
-            ttk.Spinbox(self, textvariable=self.length, command=length_spinbox_changed, increment=0.1, wrap=True, width=5, from_=1, to=50) \
+            ttk.Spinbox(self, textvariable=self.length, command=length_spinbox_changed, increment=1, wrap=True, width=5, from_=1, to=10) \
                 .grid(column=2, row=0, sticky=tk.W, **options)
 
             # get mass of pendulum
@@ -153,9 +153,9 @@ class MainFrame(ttk.Frame):
 
             # get initial_angle of pendulum
             ttk.Label(self, text="Initial Angle").grid(column=0, row=3, sticky=tk.E, **options)
-            ttk.Scale(self, variable=self.initial_angle_deg, command=initial_angle_slider_changed, orient='horizontal', length=150, from_=1, to=50) \
+            ttk.Scale(self, variable=self.initial_angle_deg, command=initial_angle_slider_changed, orient='horizontal', length=150, from_=1, to=100) \
                 .grid(column=1, row=3, sticky=tk.W, **options)
-            ttk.Spinbox(self, textvariable=self.initial_angle_deg, command=initial_angle_spinbox_changed, increment=0.1, wrap=True, width=5, from_=1, to=50) \
+            ttk.Spinbox(self, textvariable=self.initial_angle_deg, command=initial_angle_spinbox_changed, increment=0.1, wrap=True, width=5, from_=1, to=100) \
                 .grid(column=2, row=3, sticky=tk.W, **options)
 
             # get initial_angular_velocity of pendulum
@@ -380,7 +380,6 @@ class MainFrame(ttk.Frame):
                 self.ax1.update_datalim(ax1_lim)
             else:
                 self.ax1.relim()
-                print('relim')
             self.ax1.autoscale(enable=True, axis="y", tight=True)
             self.canvas1.draw()
             plt.ion()
