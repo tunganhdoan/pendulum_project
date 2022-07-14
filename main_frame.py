@@ -380,6 +380,8 @@ class MainFrame(ttk.Frame):
                 self.ax1.update_datalim(ax1_lim)
             else:
                 self.ax1.relim()
+                print('relim')
+            self.ax1.autoscale(enable=True, axis="y", tight=True)
             self.canvas1.draw()
             plt.ion()
             self.line1.set_data(self.t, self.theta)
