@@ -83,7 +83,7 @@ class MainFrame(ttk.Frame):
             return point,
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.get_tk_widget().grid(column=0, row=22, rowspan=10, columnspan=10, padx=10, pady=20)
+        self.canvas.get_tk_widget().grid(column=0, row=22, rowspan=10, columnspan=10, padx=5, pady=5)
 
         self.ax = self.fig.add_subplot(111)
         self.theta = self.initial_angle.get() * np.cos(
@@ -95,18 +95,19 @@ class MainFrame(ttk.Frame):
                                            interval=self.time_rate.get(), blit=True)
         plt.show()
 
-        # ANIMATING FIGURE 2
+        # ANIMATING FIGURE OF PENDULUM
         self.ani_fig1 = plt.Figure()
         self.ani_canvas1 = FigureCanvasTkAgg(self.ani_fig1, master=self)
-        self.ani_canvas1.get_tk_widget().grid(column=8, row=22, rowspan=10, columnspan=10, padx=10, pady=20)
+        self.ani_canvas1.get_tk_widget().grid(column=8, row=22, rowspan=10, columnspan=10, padx=5, pady=5)
         self.ani_ax1 = self.ani_fig1.add_subplot(111)
         self.theta = self.initial_angle.get() * np.cos(
             np.sqrt(self.gravity.get() / self.length.get()) * self.t)
-        self.ani_line1, = self.ani_ax1.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black',
-                                            color='black')
-        self.point, = self.ani_ax1.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black')
-        self.ani_ani1 = animation.FuncAnimation(self.ani_fig1, update_point, len(self.t),
-                                                fargs=(self.t, self.theta, self.point),
+        self.height = self.length.get() - (self.length.get() * np.cos(self.theta))
+        self.distance = self.length.get() * np.sin(self.theta)
+        self.ani_line1, = self.ani_ax1.plot(self.distance, self.height, linestyle='None')
+        self.point, = self.ani_ax1.plot([self.distance[0]], [self.height[0]], 'o', markersize=15, markerfacecolor='black')
+        self.ani_ani1 = animation.FuncAnimation(self.ani_fig1, update_point, len(self.distance),
+                                                fargs=(self.distance, self.height, self.point),
                                                 interval=self.time_rate.get(), blit=True)
         plt.show()
 
@@ -434,16 +435,29 @@ class MainFrame(ttk.Frame):
             return point,
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.get_tk_widget().grid(column=0, row=22, rowspan=10, columnspan=10, padx=10, pady=20)
+        self.canvas.get_tk_widget().grid(column=0, row=22, rowspan=10, columnspan=10, padx=5, pady=5)
 
         self.ax = self.fig.add_subplot(111)
-
         self.theta = self.initial_angle.get() * np.cos(
             np.sqrt(self.gravity.get() / self.length.get()) * self.t)
-
-        self.line1, = self.ax.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black')
-        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black')
-
+        self.line1, = self.ax.plot(self.t, self.theta, linestyle='solid', markerfacecolor='black', color='black')
+        self.point, = self.ax.plot([self.t[0]], [self.theta[0]], 'o', markersize=15, markerfacecolor='black',
+                                   color='black')
         self.ani = animation.FuncAnimation(self.fig, update_point, len(self.t), fargs=(self.t, self.theta, self.point),
-                                           interval=self.time_rate.get() / 10, blit=True)
+                                           interval=self.time_rate.get(), blit=True)
+        plt.show()
+
+        # ANIMATING FIGURE OF PENDULUM
+        self.ani_fig1 = plt.Figure()
+        self.ani_canvas1 = FigureCanvasTkAgg(self.ani_fig1, master=self)
+        self.ani_canvas1.get_tk_widget().grid(column=8, row=22, rowspan=10, columnspan=10, padx=5, pady=5)
+        self.ani_ax1 = self.ani_fig1.add_subplot(111)
+        self.theta = self.initial_angle.get() * np.cos(np.sqrt(self.gravity.get() / self.length.get()) * self.t)
+        self.height = self.length.get() - (self.length.get() * np.cos(self.theta))
+        self.distance = self.length.get() * np.sin(self.theta)
+        self.ani_line1, = self.ani_ax1.plot(self.distance, self.height, linestyle='None')
+        self.point, = self.ani_ax1.plot([self.distance[0]], [self.height[0]], 'o', markersize=15, markerfacecolor='black')
+        self.ani_ani1 = animation.FuncAnimation(self.ani_fig1, update_point, len(self.distance),
+                                                fargs=(self.distance, self.height, self.point),
+                                                interval=self.time_rate.get(), blit=True)
         plt.show()
